@@ -1,0 +1,41 @@
+{% extends "admin/base.html" %}
+{% block title %}Fees{% endblock %}
+{% block body %}
+<div class="head"><h1>Fees</h1></div>
+
+<div class="card" style="margin-bottom:16px">
+  <form method="GET" action="/admin/fees" style="display:flex;gap:10px;align-items:end">
+    <div style="flex:1"><label>Search</label><input name="q" value="{{ q }}" placeholder="Student ID or name"></div>
+    <button class="btn ghost" type="submit">Search</button>
+  </form>
+</div>
+
+{# one form per row, associated to inputs via the form="" attribute (valid HTML) #}
+{% for r in rows %}
+<form id="fee_{{ r.student_id }}" method="POST" action="/admin/fees?q={{ q }}">
+  <input type="hidden" name="student_id" value="{{ r.student_id }}">
+</form>
+{% endfor %}
+
+<div class="card">
+  <table>
+    <thead><tr><th>Student</th><th>Course</th><th>Sem</th><th>Total</th><th>Paid</th><th>Pending</th><th>Last date</th><th></th></tr></thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td style="white-space:nowrap"><b>{{ r.student_id }}</b> · {{ r.name }}</td>
+        <td>{{ r.course_id }}</td>
+        <td>{{ r.semester }}</td>
+        <td><input form="fee_{{ r.student_id }}" name="total_fee" type="number" value="{{ r.total_fee }}" style="width:95px;padding:7px"></td>
+        <td><input form="fee_{{ r.student_id }}" name="paid_fee" type="number" value="{{ r.paid_fee }}" style="width:95px;padding:7px"></td>
+        <td style="color:#C7392F;font-weight:600">₹{{ '{:,}'.format(r.pending_fee) }}</td>
+        <td><input form="fee_{{ r.student_id }}" name="last_pay_date" type="date" value="{{ r.last_pay_date }}" style="width:150px;padding:7px"></td>
+        <td style="text-align:right"><button form="fee_{{ r.student_id }}" class="btn primary sm" type="submit">Save</button></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px">No fee records found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

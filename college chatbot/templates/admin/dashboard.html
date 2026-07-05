@@ -1,0 +1,62 @@
+{% extends "admin/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block body %}
+<div class="head"><h1>Dashboard</h1></div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:14px;margin-bottom:22px">
+  <div class="card kpi"><span>Total Students</span><b>{{ s.total_students }}</b></div>
+  <div class="card kpi"><span>Fees Collected</span><b>₹{{ '{:,}'.format(s.collected_fees) }}</b></div>
+  <div class="card kpi"><span>Fees Pending</span><b style="color:#C7392F">₹{{ '{:,}'.format(s.pending_fees) }}</b></div>
+  <div class="card kpi"><span>Open Tickets</span><b>{{ s.open_tickets }}</b></div>
+  <div class="card kpi"><span>Hostel Allotted</span><b>{{ s.hostel_allotted }}</b></div>
+  <div class="card kpi"><span>Attendance &lt; 75%</span><b style="color:#B26B00">{{ s.at_risk }}</b></div>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+  <div class="card"><h3>Students by Course</h3><canvas id="cCourse" height="200"></canvas></div>
+  <div class="card"><h3>Fees: Collected vs Pending</h3><canvas id="cFees" height="200"></canvas></div>
+  <div class="card"><h3>Students by Category</h3><canvas id="cCat" height="200"></canvas></div>
+  <div class="card"><h3>Gender Ratio</h3><canvas id="cGender" height="200"></canvas></div>
+</div>
+
+<style>
+  .kpi{display:flex;flex-direction:column;gap:6px}
+  .kpi span{font-size:12.5px;color:var(--muted);font-weight:500}
+  .kpi b{font-family:'Poppins';font-size:24px;font-weight:600}
+  .card h3{font-family:'Poppins';font-size:15px;font-weight:600;margin-bottom:14px}
+</style>
+
+<script id="stats" type="application/json">{{ s | tojson }}</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  const S = JSON.parse(document.getElementById('stats').textContent);
+  const INDIGO='#2D3A8C', SAFFRON='#FF7A3D';
+  const PALETTE=['#2D3A8C','#FF7A3D','#3BAF8C','#E0B33B','#8C4FB8','#C7392F'];
+  const cCourse = document.getElementById('cCourse');
+  const cFees = document.getElementById('cFees');
+  const cCat = document.getElementById('cCat');
+  const cGender = document.getElementById('cGender');
+  Chart.defaults.font.family = "Inter, sans-serif";
+  Chart.defaults.plugins.legend.labels.boxWidth = 12;
+
+  new Chart(cCourse, {type:'bar',
+    data:{labels:Object.keys(S.by_course),
+      datasets:[{data:Object.values(S.by_course),backgroundColor:INDIGO,borderRadius:6}]},
+    options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+
+  new Chart(cFees, {type:'doughnut',
+    data:{labels:['Collected','Pending'],
+      datasets:[{data:[S.collected_fees,S.pending_fees],backgroundColor:['#3BAF8C',SAFFRON]}]},
+    options:{cutout:'62%'}});
+
+  new Chart(cCat, {type:'bar',
+    data:{labels:Object.keys(S.by_category),
+      datasets:[{data:Object.values(S.by_category),backgroundColor:SAFFRON,borderRadius:6}]},
+    options:{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{beginAtZero:true}}}});
+
+  new Chart(cGender, {type:'doughnut',
+    data:{labels:Object.keys(S.by_gender),
+      datasets:[{data:Object.values(S.by_gender),backgroundColor:PALETTE}]},
+    options:{cutout:'62%'}});
+</script>
+{% endblock %}

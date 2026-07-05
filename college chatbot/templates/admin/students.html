@@ -1,0 +1,54 @@
+{% extends "admin/base.html" %}
+{% block title %}Students{% endblock %}
+{% block body %}
+<div class="head">
+  <h1>Students</h1>
+  <a class="btn primary" href="/admin/students/add">+ Add student</a>
+</div>
+
+<div class="card" style="margin-bottom:16px">
+  <form method="GET" action="/admin/students" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end">
+    <div style="flex:1;min-width:200px">
+      <label>Search</label>
+      <input name="q" value="{{ q }}" placeholder="ID, name or email">
+    </div>
+    <div style="width:160px">
+      <label>Course</label>
+      <select name="course">
+        <option value="">All courses</option>
+        {% for c in courses %}<option value="{{ c }}" {{ 'selected' if c==course }}>{{ c }}</option>{% endfor %}
+      </select>
+    </div>
+    <button class="btn ghost" type="submit">Filter</button>
+  </form>
+</div>
+
+<div class="card">
+  <table>
+    <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Course</th><th>Sem</th><th>Att%</th><th>CGPA</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td><b>{{ r.student_id }}</b></td>
+        <td>{{ r.name }}</td>
+        <td style="color:var(--muted)">{{ r.email }}</td>
+        <td>{{ r.course_id }}</td>
+        <td>{{ r.current_sem }}</td>
+        <td>{{ r.attendance }}</td>
+        <td>{{ r.cgpa }}</td>
+        <td>{% if r.status=='Active' %}<span class="pill green">Active</span>{% else %}<span class="pill red">Inactive</span>{% endif %}</td>
+        <td style="white-space:nowrap;text-align:right">
+          <a class="btn ghost sm" href="/admin/students/edit/{{ r.student_id }}">Edit</a>
+          <form method="POST" action="/admin/students/delete/{{ r.student_id }}" style="display:inline"
+                onsubmit="return confirm('Delete {{ r.student_id }}?')">
+            <button class="btn danger sm" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="9" style="text-align:center;color:var(--muted);padding:26px">No students found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

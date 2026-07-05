@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Admin{% endblock %} · College</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1A2238; --indigo:#2D3A8C; --indigo-2:#3B4BB8;
+    --saffron:#FF7A3D; --muted:#6B7280; --line:#E6E8F0; --bg:#F4F5F9;
+    --ok:#1E9E6A; --warn:#B26B00; --err:#C7392F;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',system-ui,sans-serif; color:var(--ink); background:var(--bg); display:flex; min-height:100vh}
+
+  /* sidebar */
+  .side{
+    width:230px; flex:none; background:#171B33; color:#C7CCE6;
+    display:flex; flex-direction:column; padding:18px 14px;
+  }
+  .side .brand{display:flex; align-items:center; gap:10px; padding:6px 8px 18px}
+  .side .mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--indigo),var(--indigo-2));
+    display:grid;place-items:center;color:#fff;font-family:'Poppins';font-weight:700}
+  .side .brand b{font-family:'Poppins';font-size:15px;color:#fff;display:block;line-height:1.1}
+  .side .brand span{font-size:11px;color:#8a90b8}
+  .nav{display:flex;flex-direction:column;gap:3px;margin-top:6px}
+  .nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;
+    color:#C7CCE6;text-decoration:none;font-size:14px;font-weight:500}
+  .nav a:hover{background:#222748;color:#fff}
+  .nav a.active{background:var(--indigo);color:#fff}
+  .side .foot{margin-top:auto}
+  .side .foot a{color:#8a90b8;font-size:13px;text-decoration:none;padding:10px 12px;display:block;border-radius:9px}
+  .side .foot a:hover{background:#222748;color:#fff}
+
+  /* main */
+  main{flex:1;min-width:0;padding:26px 30px}
+  .head{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px}
+  .head h1{font-family:'Poppins';font-size:23px;font-weight:600}
+  .flash{padding:11px 15px;border-radius:11px;font-size:14px;font-weight:500;margin-bottom:16px}
+  .flash.ok{background:#E4F6EE;color:var(--ok);border:1px solid #B6E5D0}
+  .flash.warn{background:#FBF0DC;color:var(--warn);border:1px solid #F0D9A8}
+
+  .btn{font-family:'Poppins';font-weight:600;font-size:14px;border:none;border-radius:10px;
+    padding:10px 16px;cursor:pointer;text-decoration:none;display:inline-block}
+  .btn.primary{background:linear-gradient(180deg,var(--saffron),#E85F22);color:#fff;box-shadow:0 6px 16px #FF7A3D33}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .btn.sm{padding:6px 11px;font-size:13px;border-radius:8px}
+  .btn.danger{background:#fff;color:var(--err);border:1px solid #F0C4BF}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{text-align:left;color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;
+    letter-spacing:.03em;padding:10px 12px;border-bottom:1px solid var(--line)}
+  td{padding:11px 12px;border-bottom:1px solid #F1F2F7}
+  tr:last-child td{border-bottom:none}
+  .pill{display:inline-block;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:600}
+  .pill.green{background:#E4F6EE;color:var(--ok)}
+  .pill.red{background:#FDECEA;color:var(--err)}
+  .pill.amber{background:#FBF0DC;color:var(--warn)}
+  input,select,textarea{font-family:inherit;font-size:14px;padding:10px 12px;border:1.5px solid var(--line);
+    border-radius:10px;background:#FBFBFD;width:100%}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--saffron);box-shadow:0 0 0 3px #FF7A3D26;background:#fff}
+  label{font-size:12.5px;font-weight:600;color:#3a4256;display:block;margin:0 0 5px 2px}
+  a{color:var(--indigo)}
+  @media(max-width:760px){.side{width:64px;padding:14px 8px}.side .brand b,.side .brand span,.nav a span,.side .foot a span{display:none}main{padding:18px}}
+</style>
+</head>
+<body>
+  <aside class="side">
+    <div class="brand">
+      <div class="mark">C</div>
+      <div><b>College</b><span>Admin Panel</span></div>
+    </div>
+    <nav class="nav">
+      {% set p = request.path %}
+      <a href="/admin" class="{{ 'active' if p=='/admin' }}">◆ <span>Dashboard</span></a>
+      <a href="/admin/students" class="{{ 'active' if '/students' in p }}">▤ <span>Students</span></a>
+      <a href="/admin/fees" class="{{ 'active' if '/fees' in p }}">₹ <span>Fees</span></a>
+      <a href="/admin/subjects" class="{{ 'active' if '/subjects' in p }}">▦ <span>Subjects</span></a>
+      <a href="/admin/exams" class="{{ 'active' if '/exams' in p }}">▣ <span>Exams</span></a>
+      <a href="/admin/results" class="{{ 'active' if '/results' in p }}">✓ <span>Results</span></a>
+      <a href="/admin/notices" class="{{ 'active' if '/notices' in p }}">✎ <span>Notices</span></a>
+      <a href="/admin/tickets" class="{{ 'active' if '/tickets' in p }}">✉ <span>Tickets</span></a>
+    </nav>
+    <div class="foot"><a href="/admin/logout">⏻ <span>Sign out</span></a></div>
+  </aside>
+
+  <main>
+    {% with msgs = get_flashed_messages(with_categories=true) %}
+      {% for cat, m in msgs %}<div class="flash {{ cat }}">{{ m }}</div>{% endfor %}
+    {% endwith %}
+    {% block body %}{% endblock %}
+  </main>
+</body>
+</html>

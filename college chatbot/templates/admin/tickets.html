@@ -1,0 +1,40 @@
+{% extends "admin/base.html" %}
+{% block title %}Tickets{% endblock %}
+{% block body %}
+<div class="head"><h1>Student Questions</h1></div>
+
+{% if not mail_ready %}
+<div class="flash warn">Gmail isn't configured, so answers are saved but not emailed.
+Set <code>GMAIL_USER</code> and <code>GMAIL_APP_PASSWORD</code> to enable email (see mailer.py).</div>
+{% endif %}
+
+<div style="display:flex;flex-direction:column;gap:14px">
+  {% for r in rows %}
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:start;gap:12px;flex-wrap:wrap">
+      <div>
+        <div style="font-size:13px;color:var(--muted)">{{ r.name }} · {{ r.student_id }} · {{ r.email }}</div>
+        <div style="font-family:'Poppins';font-weight:600;font-size:15.5px;margin-top:3px">{{ r.question }}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px">{{ r.created_at }}</div>
+      </div>
+      {% if r.status=='answered' %}<span class="pill green">Answered</span>
+      {% else %}<span class="pill amber">Pending</span>{% endif %}
+    </div>
+
+    {% if r.status=='answered' %}
+      <div style="margin-top:12px;padding:11px 13px;background:#F4F5F9;border-radius:10px;font-size:14px">
+        <b>Reply:</b> {{ r.answer }}
+      </div>
+    {% else %}
+      <form method="POST" action="/admin/tickets/answer/{{ r.id }}" style="margin-top:12px;display:flex;gap:10px;align-items:end">
+        <div style="flex:1"><label>Your answer</label>
+          <textarea name="answer" rows="2" placeholder="Type the reply to email…" required></textarea></div>
+        <button class="btn primary" type="submit">Send &amp; email</button>
+      </form>
+    {% endif %}
+  </div>
+  {% else %}
+  <div class="card" style="text-align:center;color:var(--muted);padding:30px">No questions yet.</div>
+  {% endfor %}
+</div>
+{% endblock %}

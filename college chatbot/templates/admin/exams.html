@@ -1,0 +1,30 @@
+{% extends "admin/base.html" %}
+{% block title %}Exam Schedule{% endblock %}
+{% block body %}
+<div class="head"><h1>Exam Schedule</h1></div>
+
+{% include "admin/_picker.html" %}
+
+<div class="card">
+  {% if rows %}
+  <form method="POST" action="/admin/exams">
+    <input type="hidden" name="course" value="{{ course }}">
+    <input type="hidden" name="sem" value="{{ sem }}">
+    <table>
+      <thead><tr><th>Subject</th><th style="width:220px">Exam date</th></tr></thead>
+      <tbody>
+        {% for r in rows %}
+        <tr>
+          <td>{{ r.subject_name }}</td>
+          <td><input type="date" name="date_{{ r.id }}" value="{{ r.exam_date or '' }}"></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div style="margin-top:16px"><button class="btn primary" type="submit">Save dates</button></div>
+  </form>
+  {% else %}
+  <p style="text-align:center;color:var(--muted);padding:24px">No subjects for {{ course }} sem {{ sem }}. Add subjects first.</p>
+  {% endif %}
+</div>
+{% endblock %}

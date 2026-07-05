@@ -1,0 +1,141 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ 'Edit' if student else 'Add' }} Student{% endblock %}
+{% block body %}
+<div class="head">
+  <h1>{{ 'Edit student' if student else 'Add student' }}</h1>
+  <a class="btn ghost" href="/admin/students">← Back</a>
+</div>
+
+{% if error %}<div class="flash warn">{{ error }}</div>{% endif %}
+
+<div class="card" style="max-width:760px">
+  <form method="POST" style="display:grid;grid-template-columns:1fr 1fr;gap:15px">
+
+    <!-- ── Identity ── -->
+    <div>
+      <label>Student ID</label>
+      <input name="student_id" value="{{ student.student_id if student }}"
+             {{ 'readonly' if student }} placeholder="e.g. BCA051" required>
+    </div>
+    <div><label>Full name</label><input name="name" value="{{ student.name if student }}" required></div>
+    <div><label>Email</label><input name="email" type="email" value="{{ student.email if student }}" required></div>
+    <div><label>Phone</label><input name="phone" value="{{ student.phone if student }}"></div>
+
+    <!-- ── Academic ── -->
+    <div>
+      <label>Course</label>
+      <select name="course_id" required>
+        {% for c in courses %}
+          <option value="{{ c }}" {{ 'selected' if student and student.course_id==c }}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label>Current semester</label>
+      <input name="current_sem" type="number" min="1" max="8"
+             value="{{ student.current_sem if student else 1 }}" required>
+    </div>
+    <div>
+      <label>Batch (e.g. 2024-2027)</label>
+      <input name="batch" value="{{ student.batch if student }}" placeholder="2024-2027">
+    </div>
+    <div>
+      <label>Division</label>
+      <select name="division">
+        {% for d in ['A','B','C'] %}
+          <option {{ 'selected' if student and student.division==d }}>{{ d }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label>Admission year</label>
+      <input name="admission_year" type="number" min="2000" max="2099"
+             value="{{ student.admission_year if student else 2024 }}">
+    </div>
+    <div>
+      <label>Attendance %</label>
+      <input name="attendance" type="number" min="0" max="100"
+             value="{{ student.attendance if student else 75 }}">
+    </div>
+
+    <!-- ── Personal ── -->
+    <div>
+      <label>Gender</label>
+      <select name="gender">
+        <option {{ 'selected' if student and student.gender=='Male' }}>Male</option>
+        <option {{ 'selected' if student and student.gender=='Female' }}>Female</option>
+      </select>
+    </div>
+    <div>
+      <label>Date of birth</label>
+      <input name="dob" type="date" value="{{ student.dob if student }}">
+    </div>
+    <div>
+      <label>Blood group</label>
+      <select name="blood_group">
+        <option value="">-- select --</option>
+        {% for bg in ['O+','O-','A+','A-','B+','B-','AB+','AB-'] %}
+          <option {{ 'selected' if student and student.blood_group==bg }}>{{ bg }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label>Category</label>
+      <select name="category">
+        {% for c in ['General','OBC','SC','ST','EWS'] %}
+          <option {{ 'selected' if student and student.category==c }}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- ── Family ── -->
+    <div>
+      <label>Father's name</label>
+      <input name="father_name" value="{{ student.father_name if student }}">
+    </div>
+    <div>
+      <label>Guardian name</label>
+      <input name="guardian_name" value="{{ student.guardian_name if student }}">
+    </div>
+    <div>
+      <label>Guardian phone</label>
+      <input name="guardian_phone" value="{{ student.guardian_phone if student }}">
+    </div>
+
+    <!-- ── Location ── -->
+    <div>
+      <label>City</label>
+      <input name="city" value="{{ student.city if student }}">
+    </div>
+    <div>
+      <label>State</label>
+      <input name="state" value="{{ student.state if student }}">
+    </div>
+    <div style="grid-column:1/3">
+      <label>Full address</label>
+      <textarea name="address" rows="2" style="width:100%;resize:vertical">{{ student.address if student }}</textarea>
+    </div>
+
+    <!-- ── Status (edit only) ── -->
+    {% if student %}
+    <div>
+      <label>Status</label>
+      <select name="status">
+        <option {{ 'selected' if student.status=='Active' }}>Active</option>
+        <option {{ 'selected' if student.status=='Inactive' }}>Inactive</option>
+      </select>
+    </div>
+    <div></div>
+    {% endif %}
+
+    <!-- ── Submit ── -->
+    <div style="grid-column:1/3;display:flex;gap:10px;margin-top:6px;align-items:center">
+      <button class="btn primary" type="submit">{{ 'Save changes' if student else 'Add student' }}</button>
+      {% if not student %}
+        <span style="font-size:12.5px;color:var(--muted)">Default password: 1234</span>
+      {% endif %}
+    </div>
+
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "admin/base.html" %}
+{% block title %}Subjects{% endblock %}
+{% block body %}
+<div class="head"><h1>Subjects</h1></div>
+
+{% include "admin/_picker.html" %}
+
+<div class="card" style="margin-bottom:16px">
+  <form method="POST" action="/admin/subjects" style="display:grid;grid-template-columns:140px 1fr 150px;gap:12px;align-items:end">
+    <input type="hidden" name="course" value="{{ course }}">
+    <input type="hidden" name="sem" value="{{ sem }}">
+    <div><label>Code</label><input name="subject_code" placeholder="{{ course }}{{ sem }}06" required></div>
+    <div><label>Subject name</label><input name="subject_name" placeholder="New subject" required></div>
+    <button class="btn primary" type="submit">+ Add subject</button>
+  </form>
+</div>
+
+<div class="card">
+  <table>
+    <thead><tr><th>Code</th><th>Subject</th><th></th></tr></thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td><b>{{ r.subject_code }}</b></td>
+        <td>{{ r.subject_name }}</td>
+        <td style="text-align:right">
+          <form method="POST" action="/admin/subjects/delete/{{ r.id }}" style="display:inline"
+                onsubmit="return confirm('Delete {{ r.subject_name }}? This also removes its exam and result rows.')">
+            <button class="btn danger sm" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="3" style="text-align:center;color:var(--muted);padding:24px">No subjects for {{ course }} sem {{ sem }}.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

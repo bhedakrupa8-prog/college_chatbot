@@ -1,0 +1,45 @@
+{% extends "admin/base.html" %}
+{% block title %}Notices{% endblock %}
+{% block body %}
+<div class="head"><h1>Notices</h1></div>
+
+<div class="card" style="margin-bottom:16px">
+  <form method="POST" action="/admin/notices" style="display:grid;gap:12px">
+    <div style="display:grid;grid-template-columns:1fr 160px;gap:12px">
+      <div><label>Title</label><input name="title" placeholder="e.g. Holiday on 15 Aug" required></div>
+      <div><label>For course</label>
+        <select name="course_id">
+          <option value="">Everyone</option>
+          {% for c in courses %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+        </select>
+      </div>
+    </div>
+    <div><label>Message</label><textarea name="body" rows="3" placeholder="Notice details…" required></textarea></div>
+    <div><button class="btn primary" type="submit">Post notice</button></div>
+  </form>
+</div>
+
+<div class="card">
+  <table>
+    <thead><tr><th>Title</th><th>Message</th><th>Audience</th><th>Date</th><th></th></tr></thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td><b>{{ r.title }}</b></td>
+        <td style="color:var(--muted)">{{ r.body }}</td>
+        <td>{{ r.course_id or 'All' }}</td>
+        <td style="white-space:nowrap">{{ r.created_at }}</td>
+        <td style="text-align:right">
+          <form method="POST" action="/admin/notices/delete/{{ r.id }}" style="display:inline"
+                onsubmit="return confirm('Delete this notice?')">
+            <button class="btn danger sm" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" style="text-align:center;color:var(--muted);padding:26px">No notices yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

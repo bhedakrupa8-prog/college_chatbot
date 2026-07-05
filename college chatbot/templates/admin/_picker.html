@@ -1,0 +1,17 @@
+﻿<div class="card" style="margin-bottom:16px">
+  <form method="GET" style="display:flex;gap:12px;align-items:end;flex-wrap:wrap">
+    <div style="width:170px">
+      <label>Course</label>
+      <select name="course" onchange="this.form.submit()">
+        {% for c in courses %}<option value="{{ c.course_id }}" {{ 'selected' if c.course_id==course }}>{{ c.course_id }}</option>{% endfor %}
+      </select>
+    </div>
+    <div style="width:140px">
+      <label>Semester</label>
+      <select name="sem" onchange="this.form.submit()">
+        {% for n in range(1, 9) %}<option value="{{ n }}" {{ 'selected' if n==sem }}>Semester {{ n }}</option>{% endfor %}
+      </select>
+    </div>
+    <button class="btn ghost" type="submit">Go</button>
+  </form>
+</div>

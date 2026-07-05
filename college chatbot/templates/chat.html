@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assistant · College Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<style>
+  :root{
+    --ink:#1A2238; --indigo:#2D3A8C; --indigo-2:#3B4BB8;
+    --saffron:#FF7A3D; --muted:#6B7280; --line:#E6E8F0;
+    --bg:#EEF0F6; --bot:#FFFFFF;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Inter',system-ui,sans-serif; color:var(--ink); background:var(--bg);
+    display:flex; flex-direction:column; height:100dvh;
+  }
+
+  /* top bar */
+  header{
+    flex:none; display:flex; align-items:center; gap:12px;
+    padding:12px 16px; background:#fff; border-bottom:1px solid var(--line);
+  }
+  .mark{
+    width:38px; height:38px; border-radius:11px; flex:none;
+    background:linear-gradient(135deg,var(--indigo),var(--indigo-2));
+    display:grid; place-items:center; color:#fff; font-family:'Poppins'; font-weight:700;
+  }
+  .who{flex:1; min-width:0}
+  .who h1{font-family:'Poppins'; font-size:15px; font-weight:600; line-height:1.1}
+  .who p{font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .out{
+    font-size:13px; font-weight:500; color:var(--muted); text-decoration:none;
+    padding:7px 12px; border:1px solid var(--line); border-radius:9px;
+  }
+  .out:hover{color:var(--ink); border-color:#cfd3e0}
+
+  /* messages */
+  .scroll{flex:1; overflow-y:auto; padding:18px 16px 8px}
+  .wrap{max-width:760px; margin:0 auto; display:flex; flex-direction:column; gap:12px}
+  .msg{display:flex; gap:9px; max-width:82%}
+  .msg.bot{align-self:flex-start}
+  .msg.user{align-self:flex-end; flex-direction:row-reverse}
+  .av{
+    width:30px; height:30px; border-radius:9px; flex:none; display:grid; place-items:center;
+    font-size:13px; font-weight:600; color:#fff; font-family:'Poppins';
+  }
+  .bot .av{background:linear-gradient(135deg,var(--indigo),var(--indigo-2))}
+  .user .av{background:var(--saffron)}
+  .bubble{
+    padding:11px 14px; border-radius:14px; font-size:14.5px; line-height:1.5;
+    white-space:pre-wrap; word-wrap:break-word;
+  }
+  .bot .bubble{background:var(--bot); border:1px solid var(--line); border-top-left-radius:5px}
+  .user .bubble{background:var(--indigo); color:#fff; border-top-right-radius:5px}
+  .typing .bubble{color:var(--muted); font-style:italic}
+
+  /* composer */
+  .composer{flex:none; background:#fff; border-top:1px solid var(--line); padding:10px 16px 14px}
+  .inner{max-width:760px; margin:0 auto}
+  .chips{display:flex; gap:8px; overflow-x:auto; padding-bottom:10px; scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{
+    flex:none; font-size:13px; font-weight:500; color:var(--indigo);
+    background:#EEF1FB; border:1px solid #DBE0F6; border-radius:999px;
+    padding:7px 13px; cursor:pointer; white-space:nowrap; transition:background .12s;
+  }
+  .chip:hover{background:#E3E8FA}
+  .bar{display:flex; gap:9px; align-items:flex-end}
+  textarea{
+    flex:1; resize:none; max-height:120px; font-family:inherit; font-size:15px;
+    padding:12px 14px; border:1.5px solid var(--line); border-radius:13px; background:#FBFBFD;
+  }
+  textarea:focus{outline:none; border-color:var(--saffron); box-shadow:0 0 0 3px #FF7A3D2a; background:#fff}
+  .send{
+    flex:none; width:46px; height:46px; border:none; border-radius:13px; cursor:pointer; color:#fff;
+    background:linear-gradient(180deg,var(--saffron),#E85F22); box-shadow:0 6px 16px #FF7A3D44;
+    display:grid; place-items:center;
+  }
+  .send:active{transform:translateY(1px)}
+  .send svg{width:20px; height:20px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+  <header>
+    <div class="mark">C</div>
+    <div class="who">
+      <h1>{{ name }}</h1>
+      <p>{{ student_id }} · College Assistant</p>
+    </div>
+    <a class="out" href="/logout">Sign out</a>
+  </header>
+
+  <div class="scroll" id="scroll">
+    <div class="wrap" id="wrap">
+      <div class="msg bot">
+        <div class="av">C</div>
+        <div class="bubble">Hi {{ name.split(' ')[0] }}! Ask me about your fees, results, exam dates, subjects, hostel or any college info. Tap a quick question below to start.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="composer">
+    <div class="inner">
+      <div class="chips" id="chips"></div>
+      <div class="bar">
+        <textarea id="box" rows="1" placeholder="Type your question…"></textarea>
+        <button class="send" id="send" aria-label="Send">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 12l16-8-6 16-2-6-8-2z" fill="currentColor"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const socket  = io();
+  const wrap    = document.getElementById('wrap');
+  const scroll  = document.getElementById('scroll');
+  const box     = document.getElementById('box');
+  const sendBtn = document.getElementById('send');
+  const chipBar = document.getElementById('chips');
+
+  const QUICK = ["My pending fees","My results","Exam dates","My subjects","Hostel details","Last date to pay fees"];
+  QUICK.forEach(t => {
+    const c = document.createElement('button');
+    c.className = 'chip'; c.textContent = t;
+    c.onclick = () => send(t);
+    chipBar.appendChild(c);
+  });
+
+  function bubble(text, who){
+    const m = document.createElement('div');
+    m.className = 'msg ' + who;
+    const av = (who === 'user') ? '{{ name[0]|upper }}' : 'C';
+    m.innerHTML = `<div class="av"></div><div class="bubble"></div>`;
+    m.querySelector('.av').textContent = av;
+    m.querySelector('.bubble').textContent = text;
+    wrap.appendChild(m);
+    scroll.scrollTop = scroll.scrollHeight;
+    return m;
+  }
+
+  let typingEl = null;
+  function showTyping(){
+    typingEl = document.createElement('div');
+    typingEl.className = 'msg bot typing';
+    typingEl.innerHTML = '<div class="av">C</div><div class="bubble">typing…</div>';
+    wrap.appendChild(typingEl);
+    scroll.scrollTop = scroll.scrollHeight;
+  }
+
+  function send(text){
+    text = (text || box.value).trim();
+    if(!text) return;
+    bubble(text, 'user');
+    box.value = ''; autoGrow();
+    showTyping();
+    socket.emit('message', text);
+  }
+
+  socket.on('message', (resp) => {
+    if(typingEl){ typingEl.remove(); typingEl = null; }
+    bubble(resp, 'bot');
+  });
+
+  sendBtn.onclick = () => send();
+  box.addEventListener('keydown', e => {
+    if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); send(); }
+  });
+  function autoGrow(){ box.style.height='auto'; box.style.height=Math.min(box.scrollHeight,120)+'px'; }
+  box.addEventListener('input', autoGrow);
+</script>
+</body>
+</html>
